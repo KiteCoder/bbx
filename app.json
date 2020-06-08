@@ -1,0 +1,17 @@
+{
+  "name": "bbx",
+  "displayName": "bbx",
+  "expo": {
+    "name": "bbx",
+    "slug": "bbx",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
