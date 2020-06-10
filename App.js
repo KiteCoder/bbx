@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { Gyroscope } from 'expo-sensors';
-import { Threashold } from './Threashold';
+import { Threshold } from './Threshold';
+import Slider from '@react-native-community/slider';
 
 export default function App() {
 
@@ -13,7 +14,13 @@ export default function App() {
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [times, setTimes] = useState([]);
-  
+
+  const [xThreshold, setXThreshold] = useState(Threshold.POSITIVE_X);
+  const [yThreshold, setYThreshold] = useState(Threshold.POSITIVE_Y);
+
+  const xThresholdRef = useRef(xThreshold);
+  const yThresholdRef = useRef(yThreshold);
+
   const isActiveRef = useRef();
   const secondsRef = useRef(seconds);
 
@@ -52,14 +59,14 @@ export default function App() {
 
     let insideBound = true;
 
-    if (position.x > Threashold.POSITIVE_X ||
-      position.x < Threashold.NEGATIVE_X ||
-      position.y > Threashold.POSITIVE_Y ||
-      position.y < Threashold.NEGATIVE_Y) {
+    if (position.x > xThresholdRef.current ||
+      position.x < (-1) * xThresholdRef.current||
+      position.y > yThresholdRef.current ||
+      position.y < (-1) * yThresholdRef.current) {
 
       insideBound = false;
 
-      if(isActiveRef.current){
+      if (isActiveRef.current) {
         setTimes((times) => ([...times, secondsRef.current]));
       }
 
@@ -72,9 +79,7 @@ export default function App() {
     setBalanceState(insideBound);
   }
 
-
   const _subscribe = () => {
-
     if (typeof window.DeviceMotionEvent.requestPermission === 'function') {
 
       // iOS 13+
@@ -96,14 +101,24 @@ export default function App() {
 
   };
 
+  const handleXSliderChange = (x) => {
+    setXThreshold(x);
+    xThresholdRef.current = x;
+  }  
+  
+  const handleYSliderChange = (y) => {
+    setYThreshold(y);
+    yThresholdRef.current = y;
+  }
+
   const _unsubscribe = () => {
     _subscription && _subscription.remove();
     _subscription = null;
   };
 
   return (
-    <View style={balanceState ? styles.balanceContainer : styles.offContainer}>
-      <View style={styles.sensor}>
+    <View>
+      <View style={balanceState ? styles.balanceContainer : styles.offContainer}>
 
         <Text style={styles.text}>Instructions:</Text>
         <Text style={styles.text}>Press start, and allow the app to use gyroscope data.</Text>
@@ -119,27 +134,57 @@ export default function App() {
             <Text>Start</Text>
           </TouchableOpacity>
         </View>
-
-        {times.map((time) => {
-          return <Text style={styles.text}>
-            time: {time}
-          </Text>
-        })}
-
       </View>
+
+      <Text>
+        These sliders can adjust the thresholds for pitch detection. The higher you go,
+        The less sensitive the app will be to fall detection.
+      </Text>
+      <Text>X Threshold (Side to side pitch)</Text>
+      <Text>{xThreshold}</Text>
+      <Slider
+        style={styles.slider}
+        maximumValue={10}
+        minimumValue={0}
+        minimumTrackTintColor="#307ecc"
+        maximumTrackTintColor="#307ecc"
+        step={0.1}
+        name="xThreshold"
+        value={Threshold.POSITIVE_X}
+        onValueChange={handleXSliderChange}
+      />
+
+      <Text>Y Threshold (Back and forward pitch)</Text>
+      <Text>{yThreshold}</Text>
+      <Slider
+        style={styles.slider}
+        maximumValue={10}
+        minimumValue={0}
+        minimumTrackTintColor="#307ecc"
+        maximumTrackTintColor="#307ecc"
+        step={0.1}
+        name="yThreshold"
+        value={Threshold.POSITIVE_Y}
+        onValueChange={handleYSliderChange}
+      />
+
+      {times.map((time) => {
+        return <Text style={styles.text}>
+          time: {time}
+        </Text>
+      })}
+
     </View>
   );
 }
 
-function round(n) {
-  if (!n) {
-    return 0;
-  }
-
-  return Math.floor(n * 100) / 100;
-}
-
 const styles = StyleSheet.create({
+  slider: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#ecf0f1',
+  },
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'stretch',

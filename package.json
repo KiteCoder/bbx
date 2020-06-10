@@ -11,6 +11,7 @@
     "deploy": "gh-pages -d web-build"
   },
   "dependencies": {
+    "@react-native-community/slider": "^3.0.0",
     "expo": "~37.0.3",
     "expo-keep-awake": "^8.1.0",
     "expo-sensors": "^8.1.0",
