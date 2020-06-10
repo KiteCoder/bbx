@@ -6,78 +6,72 @@ import { Threashold } from './Threashold';
 
 export default function App() {
 
+  const PRECISION = 10;
   useKeepAwake();
 
-  const [data, setData] = useState({});
-  const [datas, setDatas] = useState([]);
   const [balanceState, setBalanceState] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [times, setTimes] = useState([]);
+  
+  const isActiveRef = useRef();
 
-  let _currentPosition = {};
-
+  let currentTime = 0.0;
   let _subscription = null;
-  let _intervalId = null
+
+  const _reset = () => {
+    setSeconds(0.0);
+    setIsActive(false);
+  }
 
   useEffect(() => {
-    return () => {
-      _unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-
-  }, []);
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        const updateTime = Math.round(seconds * PRECISION + 0.1 * PRECISION) / PRECISION;
+        setSeconds(seconds => updateTime);
+        currentTime = updateTime;
+      }, 100);
+    } else if (!isActive && seconds !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, seconds]);
 
   const _toggle = () => {
     if (_subscription) {
       _unsubscribe();
-      _clearInterval();
+      setIsActive(false);
     } else {
       _subscribe();
-      _setInterval();
+      setIsActive(true);
     }
   };
 
-  const _setInterval = () => {
-    _intervalId = setInterval(() => {
-      setDatas((datas) => ([...datas, _currentPosition]));
-      _evaluateCurrentPosition();
-    }, 500);
-    console.log(_intervalId)
-  }
-
-  const _evaluateCurrentPosition = () => {
+  const _evaluateCurrentPosition = (position) => {
 
     let insideBound = true;
 
-    if (_currentPosition.x > Threashold.POSITIVE_X ||
-      _currentPosition.x < Threashold.NEGATIVE_X) {
+    if (position.x > Threashold.POSITIVE_X ||
+      position.x < Threashold.NEGATIVE_X ||
+      position.y > Threashold.POSITIVE_Y ||
+      position.y < Threashold.NEGATIVE_Y) {
 
       insideBound = false;
-    }
 
-    if (_currentPosition.y > Threashold.POSITIVE_Y ||
-      _currentPosition.Y < Threashold.NEGATIVE_Y) {
+      if(isActiveRef.current){
+        setTimes((times) => ([...times, currentTime]));
+      }
 
-      // outside Left bound
-      insideBound = false;
+      _reset();
+
+    } else {
+      setIsActive(true);
     }
 
     setBalanceState(insideBound);
-
   }
 
-  const _clearInterval = () => {
-    console.log("clearning interval")
-    clearInterval(_intervalId);
-  }
-
-  const _slow = () => {
-    Gyroscope.setUpdateInterval(1000);
-  };
-
-  const _fast = () => {
-    Gyroscope.setUpdateInterval(16);
-  };
 
   const _subscribe = () => {
 
@@ -97,8 +91,7 @@ export default function App() {
     }
 
     _subscription = Gyroscope.addListener(gyroscopeData => {
-      setData(gyroscopeData);
-      _currentPosition = gyroscopeData;
+      _evaluateCurrentPosition(gyroscopeData);
     });
 
   };
@@ -108,32 +101,28 @@ export default function App() {
     _subscription = null;
   };
 
-  let { x, y, z } = data;
-
   return (
     <View style={balanceState ? styles.balanceContainer : styles.offContainer}>
       <View style={styles.sensor}>
-        <Text style={styles.text}>Gyroscope:</Text>
-        <Text style={styles.text}>{datas.length}</Text>
-        <Text style={styles.text}>
-          x: {round(x)} y: {round(y)} z: {round(z)}
-        </Text>
+
+        <Text style={styles.text}>Instructions:</Text>
+        <Text style={styles.text}>Press start, and allow the app to use gyroscope data.</Text>
+        <Text style={styles.text}>Place phone face up in the center of your board.</Text>
+        <Text style={styles.text}>The background color will change if you are properly balanced, and the timer will start.</Text>
+
+        <div className="time">
+          {seconds}s
+        </div>
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={_toggle} style={styles.button}>
-            <Text>Toggle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={_slow} style={[styles.button, styles.middleButton]}>
-            <Text>Slow</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={_fast} style={styles.button}>
-            <Text>Fast</Text>
+            <Text>Start</Text>
           </TouchableOpacity>
         </View>
 
-        {datas.map((element) => {
+        {times.map((time) => {
           return <Text style={styles.text}>
-            x: {round(element.x)} y: {round(element.y)} z: {round(element.z)}
+            time: {time}
           </Text>
         })}
 
