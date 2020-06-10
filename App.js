@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { Gyroscope } from 'expo-sensors';
@@ -21,30 +21,30 @@ export default function App() {
 
   const _reset = () => {
     setSeconds(0.0);
-    setIsActive(false);
+    isActiveRef.current = false;
   }
 
   useEffect(() => {
     let interval = null;
-    if (isActive) {
+    if (isActiveRef.current) {
       interval = setInterval(() => {
         const updateTime = Math.round(seconds * PRECISION + 0.1 * PRECISION) / PRECISION;
         setSeconds(seconds => updateTime);
         currentTime = updateTime;
       }, 100);
-    } else if (!isActive && seconds !== 0) {
+    } else if (!isActiveRef.current && seconds !== 0) {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isActive, seconds]);
+  }, [isActiveRef.current, seconds]);
 
   const _toggle = () => {
     if (_subscription) {
       _unsubscribe();
-      setIsActive(false);
+      isActiveRef.current = false;
     } else {
       _subscribe();
-      setIsActive(true);
+      isActiveRef.current = true;
     }
   };
 
@@ -66,7 +66,7 @@ export default function App() {
       _reset();
 
     } else {
-      setIsActive(true);
+      isActiveRef.current = true;
     }
 
     setBalanceState(insideBound);
