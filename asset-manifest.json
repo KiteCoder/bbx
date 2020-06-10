@@ -1,0 +1,18 @@
+{
+  "files": {
+    "app.js": "/bbx/static/js/app.8a820e37.chunk.js",
+    "app.js.map": "/bbx/static/js/app.8a820e37.chunk.js.map",
+    "runtime~app.js": "/bbx/static/js/runtime~app.9e08e500.js",
+    "runtime~app.js.map": "/bbx/static/js/runtime~app.9e08e500.js.map",
+    "static/js/2.692b0e25.chunk.js": "/bbx/static/js/2.692b0e25.chunk.js",
+    "static/js/2.692b0e25.chunk.js.map": "/bbx/static/js/2.692b0e25.chunk.js.map",
+    "index.html": "/bbx/index.html",
+    "manifest.json": "/bbx/manifest.json",
+    "serve.json": "/bbx/serve.json"
+  },
+  "entrypoints": [
+    "static/js/runtime~app.9e08e500.js",
+    "static/js/2.692b0e25.chunk.js",
+    "static/js/app.8a820e37.chunk.js"
+  ]
+}
