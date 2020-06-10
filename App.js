@@ -15,8 +15,8 @@ export default function App() {
   const [times, setTimes] = useState([]);
   
   const isActiveRef = useRef();
+  const secondsRef = useRef(seconds);
 
-  let currentTime = 0.0;
   let _subscription = null;
 
   const _reset = () => {
@@ -30,7 +30,7 @@ export default function App() {
       interval = setInterval(() => {
         const updateTime = Math.round(seconds * PRECISION + 0.1 * PRECISION) / PRECISION;
         setSeconds(seconds => updateTime);
-        currentTime = updateTime;
+        secondsRef.current = updateTime;
       }, 100);
     } else if (!isActiveRef.current && seconds !== 0) {
       clearInterval(interval);
@@ -60,7 +60,7 @@ export default function App() {
       insideBound = false;
 
       if(isActiveRef.current){
-        setTimes((times) => ([...times, currentTime]));
+        setTimes((times) => ([...times, secondsRef.current]));
       }
 
       _reset();
