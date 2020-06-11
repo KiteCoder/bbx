@@ -25,10 +25,19 @@ export default function App() {
   const secondsRef = useRef(seconds);
 
   let _subscription = null;
+  let _positionPollIntervalId = null;
+
+  let _currentPosition = {};
 
   const _reset = () => {
     setSeconds(0.0);
     isActiveRef.current = false;
+  }
+
+  const _setPositionPollInterval = () => {
+    _positionPollIntervalId = setInterval(() => {
+      _evaluateCurrentPosition();
+    }, 500);
   }
 
   useEffect(() => {
@@ -52,17 +61,18 @@ export default function App() {
     } else {
       _subscribe();
       isActiveRef.current = true;
+      _setPositionPollInterval();
     }
   };
 
-  const _evaluateCurrentPosition = (position) => {
+  const _evaluateCurrentPosition = () => {
 
     let insideBound = true;
 
-    if (position.x > xThresholdRef.current ||
-      position.x < (-1) * xThresholdRef.current||
-      position.y > yThresholdRef.current ||
-      position.y < (-1) * yThresholdRef.current) {
+    if (_currentPosition.x > xThresholdRef.current ||
+      _currentPosition.x < (-1) * xThresholdRef.current||
+      _currentPosition.y > yThresholdRef.current ||
+      _currentPosition.y < (-1) * yThresholdRef.current) {
 
       insideBound = false;
 
@@ -96,7 +106,7 @@ export default function App() {
     }
 
     _subscription = Gyroscope.addListener(gyroscopeData => {
-      _evaluateCurrentPosition(gyroscopeData);
+      _currentPosition = gyroscopeData;
     });
 
   };
