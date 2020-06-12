@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "4bfadf941fe9327f5332",
-    "url": "/bbx/static/js/app.41b85ca4.chunk.js"
+    "revision": "e5e9aa7e1c5c8be16f40",
+    "url": "/bbx/static/js/app.05023ebb.chunk.js"
   },
   {
     "revision": "f45fbd2acf6aaf103057",
@@ -12,15 +12,15 @@ self.__precacheManifest = [
     "url": "/bbx/static/js/2.bdaf5c42.chunk.js"
   },
   {
-    "revision": "48c7ed4e7da9792af288a60d7242d615",
-    "url": "/bbx/expo-service-worker.js"
-  },
-  {
     "revision": "ec543248d7b23864564429fc03837190",
     "url": "/bbx/serve.json"
   },
   {
-    "revision": "167845b2672732a7b3464f03cd3ba24a",
+    "revision": "48c7ed4e7da9792af288a60d7242d615",
+    "url": "/bbx/expo-service-worker.js"
+  },
+  {
+    "revision": "8e7af40624845637809866ade9af148a",
     "url": "/bbx/index.html"
   },
   {
